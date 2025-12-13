@@ -1,0 +1,24 @@
+# Gesture Language Detection / NLP Project Requirements
+
+# Core utilities (built-in, no installation required)
+# os
+# re
+# string
+
+# Data handling
+pandas==2.2.3
+numpy==2.1.2
+
+# NLP preprocessing
+nltk==3.9.1
+
+# Classical Machine Learning
+scikit-learn==1.5.2
+
+# Deep Learning (BERT / PyTorch)
+torch==2.5.1
+transformers==4.46.2
+
+# Visualization (optional)
+matplotlib==3.9.2
+seaborn==0.13.2

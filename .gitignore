@@ -1,0 +1,11 @@
+*.pkl
+
+
+venv/
+gesture-env/
+__pycache__/
+*.pyc
+.DS_Store
+model.h5
+*.npy
+
