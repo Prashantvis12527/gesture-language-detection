@@ -1,0 +1,30 @@
+# ===============================
+# Gesture Language Detection Project
+# Requirements for macOS and Windows
+# ===============================
+
+# ---------- Core numerical library ----------
+numpy==1.26.4
+
+# ---------- Computer Vision ----------
+opencv-python==4.9.0.80
+
+# ---------- Hand landmark detection ----------
+mediapipe==0.10.9
+
+# ---------- Machine Learning ----------
+scikit-learn==1.5.2
+
+# ---------- Web backend (for website integration) ----------
+flask==3.0.3
+
+-----To Install All These Libraries In Once paste this command in terminal-----
+-- pip install -r requirements_mac_windows.txt
+
+# ===============================
+# Notes:
+# - Compatible with Python 3.9 and 3.10
+# - Tested on macOS (Intel / Apple Silicon)
+# - Tested on Windows 10 / 11
+# - TensorFlow is NOT required
+# ===============================
