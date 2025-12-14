@@ -1,29 +1,29 @@
-# ---------- Import required libraries ----------
 from flask import Flask, render_template, Response
 import cv2
 import mediapipe as mp
 import numpy as np
 import pickle
 import os
+import time
 
-# ---------- Create Flask app ----------
 app = Flask(__name__)
 
-# ---------- Load trained gesture model ----------
+# Load model
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-
 with open(os.path.join(BASE_DIR, "gesture_model.pkl"), "rb") as f:
     model, encoder = pickle.load(f)
 
-# ---------- MediaPipe setup ----------
 mp_hands = mp.solutions.hands
 mp_draw = mp.solutions.drawing_utils
 
-# ---------- Open webcam ----------
-cap = cv2.VideoCapture(0)
 
-# ---------- Generator function for video streaming ----------
 def generate_frames():
+    cap = cv2.VideoCapture(0)
+
+    if not cap.isOpened():
+        print("❌ Camera not accessible")
+        return
+
     with mp_hands.Hands(
         static_image_mode=False,
         max_num_hands=1,
@@ -48,21 +48,18 @@ def generate_frames():
                         mp_hands.HAND_CONNECTIONS
                     )
 
-                    # ----- Feature extraction -----
                     features = []
                     for lm in hand_landmarks.landmark:
                         features.extend([lm.x, lm.y, lm.z])
 
                     features = np.array(features).reshape(1, -1)
 
-                    # ----- Prediction -----
                     probs = model.predict_proba(features)[0]
                     idx = np.argmax(probs)
 
                     gesture = encoder.inverse_transform([idx])[0]
                     confidence = probs[idx] * 100
 
-                    # ----- Display result -----
                     cv2.putText(
                         frame,
                         f"{gesture} ({confidence:.2f}%)",
@@ -73,20 +70,23 @@ def generate_frames():
                         2
                     )
 
-            # Convert frame to JPEG
             ret, buffer = cv2.imencode(".jpg", frame)
             frame = buffer.tobytes()
 
-            # Stream frame to browser
             yield (b"--frame\r\n"
                    b"Content-Type: image/jpeg\r\n\r\n" + frame + b"\r\n")
 
-# ---------- Route for homepage ----------
+            # IMPORTANT: small delay to avoid blocking browser
+            time.sleep(0.03)
+
+    cap.release()
+
+
 @app.route("/")
 def index():
     return render_template("index.html")
 
-# ---------- Route for video feed ----------
+
 @app.route("/video")
 def video():
     return Response(
@@ -94,8 +94,6 @@ def video():
         mimetype="multipart/x-mixed-replace; boundary=frame"
     )
 
-# ---------- Run Flask app ----------
+
 if __name__ == "__main__":
-    app.run(debug=True)
-
-
+    app.run(host="0.0.0.0", port=8000, debug=False, threaded=True)
